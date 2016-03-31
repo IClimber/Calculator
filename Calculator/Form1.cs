@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Diagnostics;
 
-namespace Calculator
+namespace Calc
 {
     public partial class Form1 : Form
     {

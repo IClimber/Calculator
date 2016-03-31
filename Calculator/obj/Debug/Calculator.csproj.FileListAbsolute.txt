@@ -1,9 +1,9 @@
 D:\Мої документи\C#\Calculator\Calculator\bin\Debug\Calculator.exe.config
 D:\Мої документи\C#\Calculator\Calculator\obj\Debug\Calculator.csprojResolveAssemblyReference.cache
-D:\Мої документи\C#\Calculator\Calculator\obj\Debug\Calculator.Form1.resources
-D:\Мої документи\C#\Calculator\Calculator\obj\Debug\Calculator.Properties.Resources.resources
 D:\Мої документи\C#\Calculator\Calculator\obj\Debug\Calculator.csproj.GenerateResource.Cache
 D:\Мої документи\C#\Calculator\Calculator\bin\Debug\Calculator.exe
 D:\Мої документи\C#\Calculator\Calculator\bin\Debug\Calculator.pdb
 D:\Мої документи\C#\Calculator\Calculator\obj\Debug\Calculator.exe
 D:\Мої документи\C#\Calculator\Calculator\obj\Debug\Calculator.pdb
+D:\Мої документи\C#\Calculator\Calculator\obj\Debug\Calc.Form1.resources
+D:\Мої документи\C#\Calculator\Calculator\obj\Debug\Calc.Properties.Resources.resources

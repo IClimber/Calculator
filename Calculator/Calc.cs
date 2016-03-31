@@ -1,12 +1,11 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
-using System.Windows.Forms;
+//using System.Windows;
 
-namespace Calculator
+namespace Calc
 {
     class Calculator
     {
@@ -31,15 +30,18 @@ namespace Calculator
 
         public RPoint[] GraphPoints;
 
-        private decimal Factorial(decimal ch)
+        private static decimal Val1, Val2;
+        private static Random Rand = new Random();
+
+        private static decimal Factorial(decimal ch)
         {
             if (ch < 0)
                 return decimal.MaxValue;
-            
+
             decimal R = 1;
             if (ch == 0)
                 return 0;
-            
+
             for (int i = 1; i <= ch; i++)
                 R *= i;
             return R;
@@ -61,14 +63,14 @@ namespace Calculator
 
         private byte GetPriority(string c)
         {
-            if (InSet(c, new string[] {"(", ")"})) return 1;
-            if (InSet(c, new string[] {"+", "-"})) return 2;
-            if (InSet(c, new string[] {"*", "/", "%", "mod", "div", "and", "xor", "or"})) return 3;
-            if (InSet(c, new string[] {"^", "!"})) return 4;
+            if (InSet(c, new string[] { "(", ")" })) return 1;
+            if (InSet(c, new string[] { "+", "-" })) return 2;
+            if (InSet(c, new string[] { "*", "/", "%", "mod", "div", "and", "xor", "or" })) return 3;
+            if (InSet(c, new string[] { "^", "!" })) return 4;
             if (InSet(c, new string[] {"cos", "sin", "tan", "ctg", "arccos", "arcsin", "arctan", "arcctg",
                 "sqr", "sqrt", "ln", "lg", "log2", "exp", "CTF", "CTK", "FTC", "FTK", "KTC", "KTF",
                 "not", "abs", "ceil", "round", "trunc", "frac", "random"})) return 5;
-            
+
             return 0;
         }
 
@@ -100,7 +102,7 @@ namespace Calculator
                 return 3;
             }
 
-            return 0;            
+            return 0;
         }
 
         public void ParseString(string S, ref List<string> _Stack)
@@ -118,7 +120,7 @@ namespace Calculator
                         TStr = Convert.ToString(Convert.ToInt64(TStr.Substring(0, TStr.Length - 1), 16), 10);
                         break;
                     case 2:
-                        TStr = Convert.ToString(Convert.ToInt64(TStr.Substring(0, TStr.Length - 1), 8), 10);                        
+                        TStr = Convert.ToString(Convert.ToInt64(TStr.Substring(0, TStr.Length - 1), 8), 10);
                         break;
                     case 3:
                         TStr = Convert.ToString(Convert.ToInt64(TStr.Substring(0, TStr.Length - 1), 2), 10);
@@ -133,11 +135,11 @@ namespace Calculator
                         flag = false;
                     }
                     else
-                        _Stack.Add(TStr);                        
+                        _Stack.Add(TStr);
 
                 if (TStr[0] == DecimalSeparator)
                 {
-                    _Stack[_Stack.Count-1] = _Stack[_Stack.Count-1] + TStr;
+                    _Stack[_Stack.Count - 1] = _Stack[_Stack.Count - 1] + TStr;
                     flag = true;
                 }
 
@@ -145,7 +147,7 @@ namespace Calculator
                 {
                     if (Temp.Count == 0)
                         Temp.Add(TStr);
-                    else                    
+                    else
                         if (PR > GetPriority(Temp[Temp.Count - 1]))
                             Temp.Add(TStr);
                         else
@@ -161,7 +163,7 @@ namespace Calculator
                             }
 
                             Temp.Add(TStr);
-                        }                    
+                        }
                 }
 
                 if (TStr[0] == '(')
@@ -191,98 +193,79 @@ namespace Calculator
             }
         }
 
+        private static Dictionary<string, Func<string>> dict = new Dictionary<string, Func<string>>
+        {
+            {"+", () => (Val1 + Val2).ToString() },
+            {"-", () => (Val1 - Val2).ToString() },
+            {"*", () => (Val1 * Val2).ToString() },
+            {"/", () => (Val1 / Val2).ToString() },
+            {"^", () => ((decimal)Math.Pow((double)Val1, (double)Val2)).ToString() },           
+            {"!", () => Factorial(Val2).ToString() },
+            {"%", () => (Val1 % Val2).ToString() },
+            {"mod", () => (Val1 / Val2).ToString() },
+            {"div", () => Math.Truncate(Val1 / Val2).ToString() },
+            {"and", () => ((Int64)Val1 & (Int64)Val2).ToString() },
+            {"or", () => ((Int64)Val1 | (Int64)Val2).ToString() },
+            {"xor", () => ((Int64)Val1 ^ (Int64)Val2).ToString() },
+            {"sin", () => ((decimal)Math.Sin((double)Val2 / (180 / Math.PI))).ToString() },
+            {"cos", () => ((decimal)Math.Cos((double)Val2 / (180 / Math.PI))).ToString() },
+            {"tan", () => ((decimal)Math.Tan((double)Val2 / (180 / Math.PI))).ToString() },
+            {"ctg", () => (1 / (decimal)Math.Tan((double)Val2 / (180 / Math.PI))).ToString() },
+            {"arcsin", () => ((decimal)(Math.Asin((double)Val2) * (180 / Math.PI))).ToString() },
+            {"arccos", () => ((decimal)(Math.Acos((double)Val2) * (180 / Math.PI))).ToString() },
+            {"arctan", () => ((decimal)(Math.Atan((double)Val2) * (180 / Math.PI))).ToString() },
+            {"arcctg", () => ((decimal)((Math.PI / 2 - Math.Atan((double)Val2)) * (180 / Math.PI))).ToString() },
+            {"ln", () => ((decimal)Math.Log((double)Val2)).ToString() },
+            {"lg", () => ((decimal)Math.Log10((double)Val2)).ToString() },
+            {"log2", () => ((decimal)Math.Log((double)Val2, 2)).ToString() },
+            {"sqr", () => ((decimal)Math.Pow((double)Val2, 2)).ToString() },
+            {"sqrt", () => ((decimal)Math.Sqrt((double)Val2)).ToString() },
+            {"random", () => Rand.Next((int)Val2).ToString() },
+            {"round", () => Math.Round(Val2).ToString() },
+            {"ceil", () => Math.Ceiling(Val2).ToString() },
+            {"trunc", () => Math.Truncate(Val2).ToString() },
+            {"frac", () => (Val2 - Math.Truncate(Val2)).ToString() },
+            {"ctf", () => (Val2 * 9 / 5 + 32).ToString() },
+            {"ctk", () => (Val2 + (decimal)273.15).ToString() },
+            {"ftc", () => ((Val2 - 32) / 9 * 5).ToString() },
+            {"ftk", () => ((Val2 - 32) / 9 * 5 + (decimal)273.15).ToString() },
+            {"ktc", () => (Val2 - (decimal)273.15).ToString() },
+            {"ktf", () => ((Val2 - (decimal)273.15) * 9 / 5 + 32).ToString() },
+            {"not", () => (-Val2).ToString() },
+            {"abs", () => Math.Abs(Val2).ToString() },
+            {"exp", () =>  Math.Exp((double)Val2).ToString() }            
+        };
+
         private decimal Calc(ref List<string> _Stack)
         {
             List<string> Temp = new List<string>();
-            decimal a1, a2;
-            Random Rand = new Random();
 
             for (int i = 0; i < _Stack.Count; i++)
+            {
                 if (Regex.IsMatch(_Stack[i][0].ToString(), "[0-9]"))
                     Temp.Add(_Stack[i]);
                 else
                 {
-                    a2 = Convert.ToDecimal(Temp[Temp.Count - 1]);
+                    Val2 = Convert.ToDecimal(Temp[Temp.Count - 1]);
                     Temp.RemoveAt(Temp.Count - 1);
 
-                    a1 = 0;
+                    Val1 = 0;
                     if (InSet(_Stack[i], new string[] { "+", "-", "/", "*", "^", "%", "mod", "div", "and", "or", "xor" }))
                         if (Temp.Count > 0)
                         {
-                            a1 = Convert.ToDecimal(Temp[Temp.Count - 1]);
+                            Val1 = Convert.ToDecimal(Temp[Temp.Count - 1]);
                             Temp.RemoveAt(Temp.Count - 1);
                         }
 
-                    switch (_Stack[i].ToLower())
-                    {
-                        case "+":   Temp.Add((a1 + a2).ToString());
-                            break;
-                        case "-": Temp.Add((a1 - a2).ToString());
-                            break;
-                        case "/": Temp.Add((a1 / a2).ToString());
-                            break;
-                        case "*": Temp.Add((a1 * a2).ToString());
-                            break;
-                        case "^": Temp.Add(((decimal)Math.Pow((double)a1, (double)a2)).ToString());
-                            break;
-                        case "!": Temp.Add(Factorial(a2).ToString());
-                            break;
-                        case "%": Temp.Add((a1 % a2).ToString());
-                            break;
-                        case "mod": Temp.Add((a1 % a2).ToString());
-                            break;
-                        case "div": Temp.Add(Math.Truncate(a1 / a2).ToString());
-                            break;
-                        case "and": Temp.Add(((Int64)a1 & (Int64)a2).ToString());
-                            break;
-                        case "or": Temp.Add(((Int64)a1 | (Int64)a2).ToString());
-                            break;
-                        case "xor": Temp.Add(((Int64)a1 ^ (Int64)a2).ToString());
-                            break;
-                        case "sin": Temp.Add(((decimal)Math.Sin((double)a2 / (180 / Math.PI))).ToString());
-                            break;
-                        case "cos": Temp.Add(((decimal)Math.Cos((double)a2 / (180 / Math.PI))).ToString());
-                            break;
-                        case "tan": Temp.Add(((decimal)Math.Tan((double)a2 / (180 / Math.PI))).ToString());
-                            break;
-                        case "ctg": Temp.Add((1/(decimal)Math.Tan((double)a2 / (180 / Math.PI))).ToString());
-                            break;
-                        case "arcsin": Temp.Add(((decimal)(Math.Asin((double)a2) * (180 / Math.PI))).ToString());
-                            break;
-                        case "arccos": Temp.Add(((decimal)(Math.Acos((double)a2) * (180 / Math.PI))).ToString());
-                            break;
-                        case "arctan": Temp.Add(((decimal)(Math.Atan((double)a2) * (180 / Math.PI))).ToString());
-                            break;
-                        case "arcctg": Temp.Add(((decimal)((Math.PI/2 - Math.Atan((double)a2)) * (180 / Math.PI))).ToString());
-                            break;
-                        case "ln": Temp.Add(((decimal)Math.Log((double)a2)).ToString());
-                            break;
-                        case "lg": Temp.Add(((decimal)Math.Log10((double)a2)).ToString());
-                            break;
-                        case "log2": Temp.Add(((decimal)Math.Log((double)a2, 2)).ToString());
-                            break;
-                        case "sqr": Temp.Add(((decimal)Math.Pow((double)a2, 2)).ToString());
-                            break;
-                        case "sqrt": Temp.Add(((decimal)Math.Sqrt((double)a2)).ToString());
-                            break;
-                        case "random": Temp.Add(Rand.Next((int)a2).ToString());
-                            break;
-                        case "round": Temp.Add(Math.Round(a2).ToString());
-                            break;
-                        case "ceil": Temp.Add(Math.Ceiling(a2).ToString());
-                            break;
-                        case "trunc": Temp.Add(Math.Truncate(a2).ToString());
-                            break;
-                        case "floor": Temp.Add(Math.Floor(a2).ToString());
-                            break;
-                    }                    
+                    Temp.Add(dict[_Stack[i].ToLower()]());
                 }
+            }
             return decimal.Parse(Temp[0]);
         }
 
         private string NormalizeString(string S)
         {
-            return S.Replace("pi", Math.PI.ToString()).Replace("  ", " ").Replace("(-", "(0-").Replace("--", "+").Replace("++", "+").Replace("-+", "-").Replace("+-", "-").Replace("//", "/").Replace("**", "*");
+            return S.Replace("pi", Math.PI.ToString()).Replace("  ", " ").Replace("(-", "(0-").Replace("=-", "=0-").Replace("--", "+").Replace("++", "+").Replace("-+", "-").Replace("+-", "-").Replace("//", "/").Replace("**", "*");
         }
 
         private void VarsReplace(ref List<string> Formul, int ToPos)
@@ -292,7 +275,7 @@ namespace Calculator
                     if (Formul[i] == Vars[j].Name)
                         Formul[i] = Vars[j].Value.ToString();
         }
-        
+
         private void AddVars(string S)
         {
             int L = Vars.Count;
@@ -303,7 +286,7 @@ namespace Calculator
             Item.Value = 0;
             Item.ValueTo = 0;
             Item.Step = 0;
-            
+
             int A = S.IndexOf('=');
             string Str = S.Substring(A + 1, S.Length - A - 1);
             List<string> Temp = new List<string>();
@@ -314,17 +297,17 @@ namespace Calculator
             string T = "0";
             string St = "0";
 
-            int B = Str.IndexOf("..", Math.Min(A, Str.Length));            
+            int B = Str.IndexOf("..", Math.Min(A, Str.Length));
             int C = Str.IndexOf(',', Math.Max(B - 1, 0));
             if (B >= 0)
                 St = "1";
 
             if (C >= 0)
-            {                
+            {
                 St = Str.Substring(C + 1, Str.Length - C - 1);
-                Str = Str.Substring(0, C - 1);                
+                Str = Str.Substring(0, C - 1);
             }
-            
+
             if (B >= 0)
             {
                 T = Str.Substring(B + 2, Str.Length - B - 2);
@@ -335,10 +318,10 @@ namespace Calculator
                 F = Str;
                 T = Str;
             }
-            
-            ParseString(F, ref Item.ValStr);            
+
+            ParseString(F, ref Item.ValStr);
             Temp.Clear();
-            Temp.AddRange(Item.ValStr);            
+            Temp.AddRange(Item.ValStr);
             Vars.Add(Item);
             VarsReplace(ref Temp, L - 1);
             TVars TV = Vars[L];
@@ -404,14 +387,14 @@ namespace Calculator
                 if (P >= 0)
                     S = S.Substring(0, P);
                 P = S.IndexOf('=');
-                if (P >= 0)                    
+                if (P >= 0)
                     AddVars(NormalizeString(S));
                 else
                     F = F + S;
             }
 
             F = NormalizeString(F);
-            ParseString(F, ref Formula);            
+            ParseString(F, ref Formula);
         }
 
         private int GetMinMax()
@@ -431,14 +414,14 @@ namespace Calculator
                 return 0;
 
             List<string> CalcList = new List<string>();
-            CalcList = CalcFormula.Split('\n').ToList();            
-            ParseCalcText(CalcList);            
+            CalcList = CalcFormula.Split('\r', '\n').ToList();
+            ParseCalcText(CalcList);
 
             if (Formula.Count == 0)
                 return 0;
 
-            List<string> Temp = new List<string>(Formula);            
-            VarsReplace(ref Temp, Vars.Count-1);
+            List<string> Temp = new List<string>(Formula);
+            VarsReplace(ref Temp, Vars.Count - 1);
             decimal Res = Calc(ref Temp);
 
             int V = GetMinMax();
@@ -457,7 +440,7 @@ namespace Calculator
                     var TV = Vars[V];
                     TV.Value += TV.Step;
                     Vars[V] = TV;
-                    UpdateVars(V+1);
+                    UpdateVars(V + 1);
                     i++;
                 }
                 if (i != GraphPoints.Length)

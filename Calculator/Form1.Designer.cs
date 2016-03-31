@@ -1,4 +1,4 @@
-﻿namespace Calculator
+﻿namespace Calc
 {
     partial class Form1
     {
